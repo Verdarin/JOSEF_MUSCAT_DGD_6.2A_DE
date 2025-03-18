@@ -1,6 +1,7 @@
 from fastapi import APIRouter, File, UploadFile, HTTPException, Response
 from project.database import fs_audio, db
-from bson import ObjectId, InvalidId
+from bson import ObjectId
+from bson.errors import InvalidId
 import re
 
 # Create a router
@@ -71,7 +72,7 @@ async def delete_audio(audio_id: str):
         except InvalidId: # If the audio_id is invalid
             raise HTTPException(status_code=400, detail="Invalid audio_id format") # Return a 400 error
         
-        await fs_audio.delete(ObjectId(audio_id)) # Delete the audio file
+        await fs_audio.delete(ObjectId(obj_id)) # Delete the audio file
         return {"message": "Audio deleted"} # Return a success message
     except Exception: # If the file is not found
         raise HTTPException(status_code=404, detail="Audio not found") # Return a 404 error

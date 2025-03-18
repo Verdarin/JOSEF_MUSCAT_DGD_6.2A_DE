@@ -8,5 +8,5 @@ class PlayerScore(BaseModel):
     # min_length=1 and max_length=50 are used to define the minimum and maximum length of the player_name
     # regex=r'^[A-Za-z0-9\s]+$' is used to define a regular expression pattern for the player_name
     # ge=0 is used to define that the score must be greater than or equal to 0
-    player_name: str = Field(..., min_length=1, max_length=50, regex=r'^[A-Za-z0-9\s]+$')
+    player_name: str = Field(..., min_length=1, max_length=50, pattern=r'^[A-Za-z0-9\s]+$')
     score: int = Field(..., ge=0)

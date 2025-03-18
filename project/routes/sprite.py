@@ -1,6 +1,7 @@
 from fastapi import APIRouter, File, UploadFile, HTTPException, Response
 from project.database import fs_sprite, db
-from bson import ObjectId, InvalidId
+from bson import ObjectId
+from bson.errors import InvalidId
 import re
 
 # Create a router

@@ -1,7 +1,8 @@
 from fastapi import APIRouter, HTTPException
 from project.models import PlayerScore
 from project.database import db
-from bson import ObjectId, InvalidId
+from bson import ObjectId
+from bson.errors import InvalidId
 
 # Create a router
 router = APIRouter()
