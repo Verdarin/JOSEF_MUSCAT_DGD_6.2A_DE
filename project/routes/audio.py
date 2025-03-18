@@ -1,6 +1,5 @@
-# routes/audio.py
 from fastapi import APIRouter, File, UploadFile
-from database import db
+from project.database import db
 
 router = APIRouter()
 

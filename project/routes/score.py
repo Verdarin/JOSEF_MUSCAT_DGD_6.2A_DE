@@ -1,7 +1,6 @@
-# routes/score.py
 from fastapi import APIRouter
-from models import PlayerScore
-from database import db
+from project.models import PlayerScore
+from project.database import db
 
 router = APIRouter()
 
