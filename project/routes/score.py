@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from project.models import PlayerScore
 from project.database import db
-from bson import ObjectId
+from bson import ObjectId, InvalidId
 
 # Create a router
 router = APIRouter()
@@ -26,23 +26,46 @@ async def get_all_scores():
 #GET a score by ID
 @router.get("/get_player_score/{score_id}")
 async def get_score(score_id: str):
-    doc = await db.scores.find_one({"_id": ObjectId(score_id)}) # Retrieve the score
-    if not doc: # If the score is not found
+    try: # Try to retrieve the score
+        try: # Validate the score_id format
+            obj_id = ObjectId(score_id) # Validate the score_id format
+        except InvalidId: # If the score_id is invalid
+            raise HTTPException(status_code=400, detail="Invalid score_id format") # Return a 400 error
+        doc = await db.scores.find_one({"_id": ObjectId(obj_id)}) # Retrieve the score
+        if not doc: # If the score is not found
+            raise HTTPException(status_code=404, detail="Score not found") # Return a 404 error
+        return {"id": str(doc["_id"]), "player_name": doc["player_name"], "score": doc["score"]} # Return the score
+    except Exception: # If the score is not found
         raise HTTPException(status_code=404, detail="Score not found") # Return a 404 error
-    return {"id": str(doc["_id"]), "player_name": doc["player_name"], "score": doc["score"]} # Return the score
 
 #Update an existing score by  ID
 @router.put("/update_player_score/{score_id}")
 async def update_score(score_id: str, score: PlayerScore):
-    update_result = await db.scores.update_one({"_id": ObjectId(score_id)}, {"$set": score.dict()}) # Update the score
-    if update_result.matched_count == 0: # If the score is not found
-        raise HTTPException(status_code=404, detail="Score not found") # Return a 404 error
-    return {"message": "Score updated"} # Return a success message
+    try: # Try to update the score
+        try: # Validate the score_id format
+            obj_id = ObjectId(score_id) # Validate the score_id format
+        except InvalidId: # If the score_id is invalid
+            raise HTTPException(status_code=400, detail="Invalid score_id format") # Return a 400 error
+        
+        update_result = await db.scores.update_one({"_id": ObjectId(obj_id)}, {"$set": score.dict()}) # Update the score
+        if update_result.matched_count == 0: # If the score is not found
+            raise HTTPException(status_code=404, detail="Score not found")
+        return {"message": "Score updated"} # Return a success message
+
+    except Exception: # If the score is not found
+        raise HTTPException(status_code=404, detail="Score not found") # Return a
 
 #Delete a score
 @router.delete("/delete_player_score/{score_id}")
 async def delete_score(score_id: str):
-    delete_result = await db.scores.delete_one({"_id": ObjectId(score_id)}) # Delete the score
-    if delete_result.deleted_count == 0: # If the score is not found
-        raise HTTPException(status_code=404, detail="Score not found") # Return a 404 error
+    try: # Try to delete the score
+        try: # Validate the score_id format
+            obj_id = ObjectId(score_id) # Validate the score_id format
+        except InvalidId: # If the score_id is invalid
+            raise HTTPException(status_code=400, detail="Invalid score_id format") # Return a 400 error
+        delete_result = await db.scores.delete_one({"_id": ObjectId(obj_id)}) # Delete the score
+        if delete_result.deleted_count == 0: # If the score is not found
+            raise HTTPException(status_code=404, detail="Score not found") # Return a 404 error
+    except Exception: # If the score is not found
+        raise HTTPException(status_code=404, detail="Score not found")
     return {"message": "Score deleted"} # Return a success message
