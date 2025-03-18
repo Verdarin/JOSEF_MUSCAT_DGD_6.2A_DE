@@ -58,7 +58,8 @@ async def update_audio(audio_id: str, file: UploadFile = File(...)):
             raise HTTPException(status_code=400, detail="Invalid audio_id format") # Return a 400 error
         
         await fs_audio.delete(ObjectId(obj_id)) # Delete the existing file
-        new_file_id = await fs_audio.upload_from_stream(file.filename, file.file) # Upload the new file
+        safe_filename = fix_filename(file.filename)  # Fix the filename before use
+        new_file_id = await fs_audio.upload_from_stream(safe_filename, file.file) # Upload the new file
         return {"message": "Audio updated", "id": str(new_file_id)} # Return the new file ID
     except Exception as e: # If the file is not found
         raise HTTPException(status_code=404, detail="Audio not found or update failed") # Return a 404 error

@@ -19,7 +19,7 @@ def fix_filename(filename: str) -> str:
 async def create_sprite(file: UploadFile = File(...)):
     try: # Try to create the sprite file
         safe_filename = fix_filename(file.filename)  # Fix the filename before use
-        file_id = await fs_sprite.upload_from_stream(safe_filename.filename, file.file) # Upload the file to GridFS
+        file_id = await fs_sprite.upload_from_stream(safe_filename, file.file) # Upload the file to GridFS
         return {"message": "Sprite created", "id": str(file_id)} # Return the file ID
     except Exception as e: # If the file is not found
         raise HTTPException(status_code=500, detail=str(e)) # Return a 500 error
@@ -61,7 +61,7 @@ async def update_sprite(sprite_id: str, file: UploadFile = File(...)):
         
         await fs_sprite.delete(ObjectId(obj_id)) # Delete the existing file
         safe_filename = fix_filename(file.filename)  # Fix the filename before use
-        new_file_id = await fs_sprite.upload_from_stream(safe_filename.filename, file.file) # Upload the new file
+        new_file_id = await fs_sprite.upload_from_stream(safe_filename, file.file) # Upload the new file
         return {"message": "Sprite updated", "id": str(new_file_id)} # Return the new file ID
     except Exception as e: # If the file is not found
         raise HTTPException(status_code=404, detail="Sprite not found or update failed") # Return a 404 error

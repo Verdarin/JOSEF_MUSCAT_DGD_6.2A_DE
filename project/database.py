@@ -2,7 +2,7 @@ import motor.motor_asyncio
 from motor.motor_asyncio import AsyncIOMotorGridFSBucket
 
 #Create an AsyncIOMotorClient instance:
-client = motor.motor_asyncio.AsyncIOMotorClient("mongodb+srv://josefcarlmuscat4:0QxQeZsHKhaT1RJ7@josefmuscatdgdhomede.x9fju.mongodb.net/?retryWrites=true&w=majority&appName=JOSEFMUSCATDGDHOMEDE")
+client = motor.motor_asyncio.AsyncIOMotorClient("mongodb+srv://josefcarlmuscat4:wfBy0qGxscrgcESP@josefmuscatdgdhomede.x9fju.mongodb.net/?retryWrites=true&w=majority&appName=JOSEFMUSCATDGDHOMEDE")
 db = client.multimedia_db # Create a database instance
 
 #Create an AsyncIOMotorGridFSBucket instance for each GridFS bucket:
