@@ -2,7 +2,7 @@
     "version": 2,
     "builds": [
         {
-            "src": "project/routes/main.py",
+            "src": "project/main.py",
             "use": "@vercel/python",
             "config": {
                 "command": "uvicorn project.routes.main:app --host 0.0.0.0 --port 8000"
@@ -12,7 +12,7 @@
     "routes": [
         {
             "src": "/(.*)",
-            "dest": "project/routes/main.py"
+            "dest": "project/main.py"
         }
     ]
 }
