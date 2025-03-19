@@ -11,6 +11,10 @@ app.include_router(audio_router)
 app.include_router(sprite_router)
 app.include_router(score_router)
 
+@app.get("/")
+def root():
+    return {"message": "Hello World"}
+
 # Run the application with Uvicorn
 if __name__ == "__main__":
     import uvicorn 
