@@ -52,7 +52,7 @@ async def get_audio(audio_id: str):
 @router.put("/update_audio/{audio_id}")
 async def update_audio(audio_id: str, file: UploadFile = File(...)):
     try: # Try to update the audio file
-        try:
+        try: # Validate the audio_id format
             obj_id = ObjectId(audio_id) # Validate the audio_id format
         except InvalidId: # If the audio_id is invalid
             raise HTTPException(status_code=400, detail="Invalid audio_id format") # Return a 400 error

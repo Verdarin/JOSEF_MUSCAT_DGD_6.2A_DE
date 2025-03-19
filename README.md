@@ -6,7 +6,7 @@ Terminal -> New Terminal
 
 Activate Virtual Environment:
     Windows: env\Scripts\activate
-    MacOS source env/bin/activate
+    MacOS: source env/bin/activate
 
 Install Required Deprendencies:
     pip install -r requirements.txt
@@ -17,4 +17,4 @@ Go to project/database.py and change the client connection string to your Mongo 
 Start the Server:
     uvicorn project.main:app --reload
 
-TEST_INJECTIONS_DATA has a .mp3, and a .png sprite to use when posting with POSTMAN
+TEST_INJECTIONS_DATA has .mp3, sprite pngs and json data to feed into postman for testing.
