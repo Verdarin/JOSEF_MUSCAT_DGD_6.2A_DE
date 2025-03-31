@@ -3,21 +3,14 @@ from motor.motor_asyncio import AsyncIOMotorGridFSBucket
 from fastapi import Depends
 import os
 
-#Create an AsyncIOMotorClient instance:
+
 async def get_db():
     mongo_uri = os.getenv("MONGODB_URI")
     if not mongo_uri:
         raise ValueError("MONGODB_URI is not set in environment variables")
+    #Create an AsyncIOMotorClient instance:
     client = motor.motor_asyncio.AsyncIOMotorClient(mongo_uri)
     return client.multimedia_db
-
-
-# async def get_db():
-#     client = motor.motor_asyncio.AsyncIOMotorClient(
-#         "mongodb+srv://josefcarlmuscat4:wfBy0qGxscrgcESP@josefmuscatdgdhomede.x9fju.mongodb.net/?retryWrites=true&w=majority&appName=JOSEFMUSCATDGDHOMEDE"
-#     )
-#     db = client.multimedia_db
-#     return db
 
 
 #Create an AsyncIOMotorGridFSBucket instance for each GridFS bucket:

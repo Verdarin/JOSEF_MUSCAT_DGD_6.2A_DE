@@ -14,7 +14,7 @@ Activate Virtual Environment:
 Install Required Deprendencies:
     pip install -r requirements.txt
 
-Go to project/database.py and change the client connection string to your Mongo Atlas Cluster connection String.
+If you are running the server locally add MONGODB_URI to your envrionement variables with your MONGODB Connection String
 
 Start the Server:
     uvicorn project.main:app --reload
