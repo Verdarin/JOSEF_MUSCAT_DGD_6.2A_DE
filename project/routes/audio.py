@@ -1,5 +1,5 @@
-from fastapi import APIRouter, File, UploadFile, HTTPException, Response
-from project.database import fs_audio, db
+from fastapi import APIRouter, File, UploadFile, HTTPException, Response, Depends
+from project.database import get_fs_audio, get_db
 from bson import ObjectId
 from bson.errors import InvalidId
 import re
@@ -16,7 +16,7 @@ def fix_filename(filename: str) -> str:
 
 #Upload an audio file
 @router.post("/upload_audio")
-async def create_audio(file: UploadFile = File(...)):
+async def create_audio(file: UploadFile = File(...), fs_audio = Depends(get_fs_audio)):
     try: # Try to create the audio file
         safe_filename = fix_filename(file.filename)  # Fix the filename before use
         file_id = await fs_audio.upload_from_stream(safe_filename, file.file) # Upload the file to GridFS
@@ -26,14 +26,14 @@ async def create_audio(file: UploadFile = File(...)):
 
 #GET all audio files
 @router.get("/get_audio")
-async def get_all_audio():
+async def get_all_audio(db = Depends(get_db)):
     cursor = db["audio.files"].find()  # GridFS files are stored in 'audio.files'
     files = await cursor.to_list(length=None) # Convert the cursor to a list
     return [{"id": str(doc["_id"]), "filename": doc.get("filename", "")} for doc in files] # Return only the ID and filename
 
 #Retrieve an audio file by ID
 @router.get("/get_audio/{audio_id}")
-async def get_audio(audio_id: str):
+async def get_audio(audio_id: str, fs_audio = Depends(get_fs_audio)):
     try: # Try to retrieve the audio file
         try: # Validate the audio_id format
             obj_id = ObjectId(audio_id) # Validate the audio_id format
@@ -50,7 +50,7 @@ async def get_audio(audio_id: str):
 
 #Update an audio file by deleting the old one and uploading a new file
 @router.put("/update_audio/{audio_id}")
-async def update_audio(audio_id: str, file: UploadFile = File(...)):
+async def update_audio(audio_id: str, file: UploadFile = File(...),fs_audio = Depends(get_fs_audio)):
     try: # Try to update the audio file
         try: # Validate the audio_id format
             obj_id = ObjectId(audio_id) # Validate the audio_id format
@@ -66,7 +66,7 @@ async def update_audio(audio_id: str, file: UploadFile = File(...)):
 
 #Delete an audio file
 @router.delete("/delete_audio/{audio_id}")
-async def delete_audio(audio_id: str):
+async def delete_audio(audio_id: str, fs_audio = Depends(get_fs_audio)):
     try: # Try to delete the audio file
         try: # Validate the audio_id format
             obj_id = ObjectId(audio_id) # Validate the audio_id format

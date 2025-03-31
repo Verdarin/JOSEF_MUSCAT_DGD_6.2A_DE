@@ -1,10 +1,28 @@
 import motor.motor_asyncio
 from motor.motor_asyncio import AsyncIOMotorGridFSBucket
+from fastapi import Depends
+import os
 
 #Create an AsyncIOMotorClient instance:
-client = motor.motor_asyncio.AsyncIOMotorClient("mongodb+srv://josefcarlmuscat4:wfBy0qGxscrgcESP@josefmuscatdgdhomede.x9fju.mongodb.net/?retryWrites=true&w=majority&appName=JOSEFMUSCATDGDHOMEDE")
-db = client.multimedia_db # Create a database instance
+async def get_db():
+    mongo_uri = os.getenv("MONGODB_URI")
+    if not mongo_uri:
+        raise ValueError("MONGODB_URI is not set in environment variables")
+    client = motor.motor_asyncio.AsyncIOMotorClient(mongo_uri)
+    return client.multimedia_db
+
+
+# async def get_db():
+#     client = motor.motor_asyncio.AsyncIOMotorClient(
+#         "mongodb+srv://josefcarlmuscat4:wfBy0qGxscrgcESP@josefmuscatdgdhomede.x9fju.mongodb.net/?retryWrites=true&w=majority&appName=JOSEFMUSCATDGDHOMEDE"
+#     )
+#     db = client.multimedia_db
+#     return db
+
 
 #Create an AsyncIOMotorGridFSBucket instance for each GridFS bucket:
-fs_audio = AsyncIOMotorGridFSBucket(db, bucket_name="audio") # Create an instance for the audio bucket
-fs_sprite = AsyncIOMotorGridFSBucket(db, bucket_name="sprite") # Create an instance for the sprite bucket
+async def get_fs_audio(db=Depends(get_db)):
+    return AsyncIOMotorGridFSBucket(db, bucket_name="audio")
+
+async def get_fs_sprite(db=Depends(get_db)):
+    return AsyncIOMotorGridFSBucket(db, bucket_name="sprite")

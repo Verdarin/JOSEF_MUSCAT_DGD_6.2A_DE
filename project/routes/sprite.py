@@ -1,5 +1,5 @@
-from fastapi import APIRouter, File, UploadFile, HTTPException, Response
-from project.database import fs_sprite, db
+from fastapi import APIRouter, File, UploadFile, HTTPException, Response, Depends
+from project.database import get_fs_sprite, get_db
 from bson import ObjectId
 from bson.errors import InvalidId
 import re
@@ -16,7 +16,7 @@ def fix_filename(filename: str) -> str:
 
 #Upload a sprite file
 @router.post("/upload_sprite")
-async def create_sprite(file: UploadFile = File(...)):
+async def create_sprite(file: UploadFile = File(...), fs_sprite = Depends(get_fs_sprite)):
     try: # Try to create the sprite file
         safe_filename = fix_filename(file.filename)  # Fix the filename before use
         file_id = await fs_sprite.upload_from_stream(safe_filename, file.file) # Upload the file to GridFS
@@ -26,7 +26,7 @@ async def create_sprite(file: UploadFile = File(...)):
 
 #get all sprite files (metadata only)
 @router.get("/get_sprite")
-async def get_all_sprites():
+async def get_all_sprites(db = Depends(get_db)):
     try: # Try to retrieve all sprite files
         cursor = db["sprite.files"].find()  # GridFS files are stored in 'sprite.files'
         files = await cursor.to_list(length=None) # Convert the cursor to a list
@@ -36,7 +36,7 @@ async def get_all_sprites():
 
 #get a sprite file by ID
 @router.get("/get_sprite/{sprite_id}")
-async def get_sprite(sprite_id: str):
+async def get_sprite(sprite_id: str,fs_sprite = Depends(get_fs_sprite)):
     try: # Try to retrieve the sprite file
         try: # Validate the sprite_id format
             obj_id = ObjectId(sprite_id) # Validate the sprite_id format
@@ -52,7 +52,7 @@ async def get_sprite(sprite_id: str):
 
 #Update a sprite file by deleting the old one and uploading a new file
 @router.put("/update_sprite/{sprite_id}")
-async def update_sprite(sprite_id: str, file: UploadFile = File(...)):
+async def update_sprite(sprite_id: str, file: UploadFile = File(...), fs_sprite = Depends(get_fs_sprite)):
     try: # Try to update the sprite file
         try:
             obj_id = ObjectId(sprite_id) # Validate the sprite_id format
@@ -68,7 +68,7 @@ async def update_sprite(sprite_id: str, file: UploadFile = File(...)):
 
 #Delete a sprite file
 @router.delete("/delete_sprite/{sprite_id}")
-async def delete_sprite(sprite_id: str):
+async def delete_sprite(sprite_id: str, fs_sprite = Depends(get_fs_sprite)):
     try: # Try to delete the sprite file
         try: # Validate the sprite_id format
             obj_id = ObjectId(sprite_id) # Validate the sprite_id format

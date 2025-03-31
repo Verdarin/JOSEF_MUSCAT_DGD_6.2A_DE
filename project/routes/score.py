@@ -1,6 +1,6 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from project.models import PlayerScore
-from project.database import db
+from project.database import get_db
 from bson import ObjectId
 from bson.errors import InvalidId
 
@@ -9,14 +9,14 @@ router = APIRouter()
 
 #Create a new score
 @router.post("/create_player_score")
-async def create_score(score: PlayerScore): # Receive a PlayerScore Pydantic model
+async def create_score(score: PlayerScore,db = Depends(get_db)): # Receive a PlayerScore Pydantic model
     doc = score.dict() # Convert the Pydantic model to a dictionary
     result = await db.scores.insert_one(doc) # Insert the new score
     return {"message": "Score created", "id": str(result.inserted_id)} # Return the new score ID
 
 #GET all scores
 @router.get("/get_player_score")
-async def get_all_scores():
+async def get_all_scores(db = Depends(get_db)):
     cursor = db.scores.find() # Retrieve all scores
     scores = await cursor.to_list(length=None) # Convert the cursor to a list
     return [
@@ -26,7 +26,7 @@ async def get_all_scores():
 
 #GET a score by ID
 @router.get("/get_player_score/{score_id}")
-async def get_score(score_id: str):
+async def get_score(score_id: str,db = Depends(get_db)):
     try: # Try to retrieve the score
         try: # Validate the score_id format
             obj_id = ObjectId(score_id) # Validate the score_id format
@@ -41,7 +41,7 @@ async def get_score(score_id: str):
 
 #Update an existing score by  ID
 @router.put("/update_player_score/{score_id}")
-async def update_score(score_id: str, score: PlayerScore):
+async def update_score(score_id: str, score: PlayerScore,db = Depends(get_db)):
     try: # Try to update the score
         try: # Validate the score_id format
             obj_id = ObjectId(score_id) # Validate the score_id format
@@ -58,7 +58,7 @@ async def update_score(score_id: str, score: PlayerScore):
 
 #Delete a score
 @router.delete("/delete_player_score/{score_id}")
-async def delete_score(score_id: str):
+async def delete_score(score_id: str,db = Depends(get_db)):
     try: # Try to delete the score
         try: # Validate the score_id format
             obj_id = ObjectId(score_id) # Validate the score_id format
